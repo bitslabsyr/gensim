@@ -14,6 +14,7 @@ from six.moves.queue import Queue as _Queue
 from six.moves import xrange
 from six import iteritems
 
+import sys
 
 WINDOW_SIZE = 2
 
@@ -198,7 +199,10 @@ def _format_results(_keywords, combined_keywords, split, scores):
 
 
 def keywords(text, ratio=0.2, words=None, split=False, scores=False, pos_filter=('NN', 'JJ'),
-             lemmatize=False, deacc=True):
+             lemmatize=False, deacc=True, window_size=2):
+    # set the global window size variable, in python global variables must be declared, otherwise local
+    global WINDOW_SIZE
+    WINDOW_SIZE = window_size
     # Gets a dict of word -> lemma
     text = to_unicode(text)
     tokens = _clean_text_by_word(text, deacc=deacc)
@@ -240,3 +244,24 @@ def get_graph(text):
     _set_graph_edges(graph, tokens, split_text)
 
     return graph
+
+'''
+# Make a list of command line arguments, omitting the [0] element
+# which is the script itself.
+args = sys.argv[1:]
+if not args:
+    print('usage: python test_python.py [textfile]')
+    sys.exit(1)
+infile = args[0]
+
+testfile = open(infile, 'r', encoding="utf8")
+text = testfile.read()
+print('read text file')
+
+# use all the default parameters of the keywords function in the package
+new_window_size = 4
+result = keywords(text, window_size=new_window_size)
+
+print(type(result))
+print(result)
+'''
